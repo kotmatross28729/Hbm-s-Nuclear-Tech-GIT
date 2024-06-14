@@ -1,5 +1,6 @@
 package com.hbm.render.world;
 
+import com.hbm.render.util.Optifine;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -58,15 +59,17 @@ public class RenderNTMSkyboxImpact extends IRenderHandler {
 		final byte byte2 = 64;
 		final int i = 256 / byte2 + 2;
 		float f = 16F;
-
-		for(int j = -byte2 * i; j <= byte2 * i; j += byte2) {
-			for(int l = -byte2 * i; l <= byte2 * i; l += byte2) {
-				tessellator.startDrawingQuads();
-				tessellator.addVertex(j + 0, f, l + 0);
-				tessellator.addVertex(j + byte2, f, l + 0);
-				tessellator.addVertex(j + byte2, f, l + byte2);
-				tessellator.addVertex(j + 0, f, l + byte2);
-				tessellator.draw();
+/*OPTIFINE SHADERS BE LIKE : AAAA*/
+		if(!Optifine.shadersEnabled()) {
+			for (int j = -byte2 * i; j <= byte2 * i; j += byte2) {
+				for (int l = -byte2 * i; l <= byte2 * i; l += byte2) {
+					tessellator.startDrawingQuads();
+					tessellator.addVertex(j + 0, f, l + 0);
+					tessellator.addVertex(j + byte2, f, l + 0);
+					tessellator.addVertex(j + byte2, f, l + byte2);
+					tessellator.addVertex(j + 0, f, l + byte2);
+					tessellator.draw();
+				}
 			}
 		}
 
@@ -74,14 +77,16 @@ public class RenderNTMSkyboxImpact extends IRenderHandler {
 		this.glSkyList2 = this.starGLCallList + 2;
 		GL11.glNewList(this.glSkyList2, GL11.GL_COMPILE);
 		f = -16F;
-		tessellator.startDrawingQuads();
-
-		for(int k = -byte2 * i; k <= byte2 * i; k += byte2) {
-			for(int i1 = -byte2 * i; i1 <= byte2 * i; i1 += byte2) {
-				tessellator.addVertex(k + byte2, f, i1 + 0);
-				tessellator.addVertex(k + 0, f, i1 + 0);
-				tessellator.addVertex(k + 0, f, i1 + byte2);
-				tessellator.addVertex(k + byte2, f, i1 + byte2);
+/*OPTIFINE SHADERS BE LIKE : AAAA*/
+		if(!Optifine.shadersEnabled()) {
+			tessellator.startDrawingQuads();
+			for (int k = -byte2 * i; k <= byte2 * i; k += byte2) {
+				for (int i1 = -byte2 * i; i1 <= byte2 * i; i1 += byte2) {
+					tessellator.addVertex(k + byte2, f, i1 + 0);
+					tessellator.addVertex(k + 0, f, i1 + 0);
+					tessellator.addVertex(k + 0, f, i1 + byte2);
+					tessellator.addVertex(k + byte2, f, i1 + byte2);
+				}
 			}
 		}
 

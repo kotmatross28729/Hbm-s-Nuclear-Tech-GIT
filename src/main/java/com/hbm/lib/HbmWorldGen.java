@@ -403,8 +403,12 @@ public class HbmWorldGen implements IWorldGenerator {
 
 				if(world.getBlock(x, y - 1, z).canPlaceTorchOnTop(world, x, y - 1, z)) {
 					world.setBlock(x, y, z, ModBlocks.mine_ap);
+					if (world.getTileEntity(x, y, z) != null) {
+
 					TileEntityLandmine landmine = (TileEntityLandmine) world.getTileEntity(x, y, z);
-					landmine.waitingForPlayer = true;
+					if(landmine != null)
+						landmine.waitingForPlayer = true;
+				}
 
 					if(GeneralConfig.enableDebugMode)
 						MainRegistry.logger.info("[Debug] Successfully spawned landmine at " + x + " " + (y) + " " + z);

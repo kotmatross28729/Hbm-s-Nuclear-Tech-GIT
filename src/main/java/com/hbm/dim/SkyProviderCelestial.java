@@ -1,5 +1,6 @@
 package com.hbm.dim;
 
+import com.hbm.render.util.Optifine;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GLAllocation;
@@ -11,6 +12,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.IRenderHandler;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +24,7 @@ import com.hbm.dim.trait.CelestialBodyTrait.CBT_SUNEXPLODED;
 import com.hbm.extprop.HbmLivingProps;
 import com.hbm.saveddata.SatelliteSavedData;
 import com.hbm.saveddata.satellites.Satellite;
+import shadersmod.client.Shaders;
 
 public class SkyProviderCelestial extends IRenderHandler {
 	
@@ -40,7 +43,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 	public SkyProviderCelestial() {
 		if (!displayListsInitialized) {
-			initializeDisplayLists();
+				initializeDisplayLists();
 		}
 	}
 
@@ -56,14 +59,16 @@ public class SkyProviderCelestial extends IRenderHandler {
 		{
 			float f = 16F;
 			tessellator.startDrawingQuads();
-
-			for(int j = -byte2 * i; j <= byte2 * i; j += byte2) {
-				for(int l = -byte2 * i; l <= byte2 * i; l += byte2) {
-					tessellator.addVertex(j + 0, f, l + 0);
-					tessellator.addVertex(j + byte2, f, l + 0);
-					tessellator.addVertex(j + byte2, f, l + byte2);
-					tessellator.addVertex(j + 0, f, l + byte2);
-				}
+/*OPTIFINE SHADERS BE LIKE : AAAA*/
+			if(!Optifine.shadersEnabled()) {
+				for(int j = -byte2 * i; j <= byte2 * i; j += byte2) {
+					for(int l = -byte2 * i; l <= byte2 * i; l += byte2) {
+							tessellator.addVertex(j + 0, f, l + 0);
+							tessellator.addVertex(j + byte2, f, l + 0);
+							tessellator.addVertex(j + byte2, f, l + byte2);
+							tessellator.addVertex(j + 0, f, l + byte2);
+						}
+					}
 			}
 
 			tessellator.draw();
@@ -74,14 +79,16 @@ public class SkyProviderCelestial extends IRenderHandler {
 		{
 			float f = -16F;
 			tessellator.startDrawingQuads();
-
-			for(int k = -byte2 * i; k <= byte2 * i; k += byte2) {
-				for(int i1 = -byte2 * i; i1 <= byte2 * i; i1 += byte2) {
-					tessellator.addVertex(k + byte2, f, i1 + 0);
-					tessellator.addVertex(k + 0, f, i1 + 0);
-					tessellator.addVertex(k + 0, f, i1 + byte2);
-					tessellator.addVertex(k + byte2, f, i1 + byte2);
-				}
+/*OPTIFINE SHADERS BE LIKE : AAAA*/
+			if(!Optifine.shadersEnabled()) {
+				for(int k = -byte2 * i; k <= byte2 * i; k += byte2) {
+					for(int i1 = -byte2 * i; i1 <= byte2 * i; i1 += byte2) {
+							tessellator.addVertex(k + byte2, f, i1 + 0);
+							tessellator.addVertex(k + 0, f, i1 + 0);
+							tessellator.addVertex(k + 0, f, i1 + byte2);
+							tessellator.addVertex(k + byte2, f, i1 + byte2);
+						}
+					}
 			}
 
 			tessellator.draw();
@@ -90,7 +97,6 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 		displayListsInitialized = true;
 	}
-	
 
 	@Override
 	public void render(float partialTicks, WorldClient world, Minecraft mc) {
@@ -134,7 +140,6 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 		// Handle any special per-body sunset rendering
 		renderSunset(partialTicks, world, mc);
-
 		if(starBrightness > 0.0F) {
 			GL11.glPushMatrix();
 			{
@@ -238,7 +243,6 @@ public class SkyProviderCelestial extends IRenderHandler {
 				tessellator.addVertexWithUV(-coronaSize, 100.0D, coronaSize, 0.0D, 1.0D);
 				tessellator.draw();
 			}
-
 			
 			double minSize = 1D;
 			float blendAmount = hasAtmosphere ? MathHelper.clamp_float(1 - world.getSunBrightnessFactor(partialTicks), 0.25F, 1F) : 1F;
@@ -284,7 +288,6 @@ public class SkyProviderCelestial extends IRenderHandler {
 						GL11.glRotated(metric.angle, 1.0, 0.0, 0.0);
 					}
 					GL11.glRotatef(metric.body.axialTilt + 90.0F, 0.0F, 1.0F, 0.0F);
-
 					tessellator.startDrawingQuads();
 					tessellator.addVertexWithUV(-size, 100.0D, -size, 0.0D, 0.0D);
 					tessellator.addVertexWithUV(size, 100.0D, -size, 1.0D, 0.0D);
@@ -313,7 +316,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 						} else {
 							mc.renderEngine.bindTexture(overlayGibbous);
 						}
-						
+
 						if(phase > 0.3F) {
 							tessellator.startDrawingQuads();
 							tessellator.addVertexWithUV(-size, 100.0D, -size, 0.0D, 0.0D);
@@ -325,7 +328,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 
 						GL11.glDisable(GL11.GL_TEXTURE_2D);
-						
+
 						// Draw another layer on top to blend with the atmosphere
 						GL11.glColor4f(skyR - blendDarken, skyG - blendDarken, skyB - blendDarken, (1 - blendAmount * visibility));
 						OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO);
@@ -336,7 +339,7 @@ public class SkyProviderCelestial extends IRenderHandler {
 						tessellator.addVertexWithUV(size, 100.0D, size, 1.0D, 1.0D);
 						tessellator.addVertexWithUV(-size, 100.0D, size, 0.0D, 1.0D);
 						tessellator.draw();
-	
+
 						GL11.glEnable(GL11.GL_TEXTURE_2D);
 					}
 
@@ -451,10 +454,8 @@ public class SkyProviderCelestial extends IRenderHandler {
 
 		GL11.glPushMatrix();
 		{
-
 			GL11.glTranslatef(0.0F, -((float) (heightAboveHorizon - 16.0D)), 0.0F);
 			GL11.glCallList(glSkyList2);
-
 		}
 		GL11.glPopMatrix();
 
